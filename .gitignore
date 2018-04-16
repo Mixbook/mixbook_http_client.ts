@@ -1,0 +1,11 @@
+.vscode
+.DS_Store
+
+node_modules
+
+build
+
+coverage
+.nyc_output
+
+yarn-error.log
