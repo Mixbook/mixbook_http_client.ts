@@ -14,13 +14,18 @@ var httpClient_1 = require("../httpClient");
 var mockHttpClientSession_1 = require("./mockHttpClientSession");
 var MockHttpClient = /** @class */ (function (_super) {
     __extends(MockHttpClient, _super);
-    function MockHttpClient() {
+    function MockHttpClient(args) {
+        if (args === void 0) { args = {}; }
         var _this = _super.call(this) || this;
-        _this._requests = {};
+        _this.isRepeating = args.isRepeating === undefined ? true : args.isRepeating;
+        _this.shouldUseBody = !!args.shouldUseBody;
+        _this.shouldUseHeaders = !!args.shouldUseHeaders;
+        _this.requests = {};
         return _this;
     }
     MockHttpClient.prototype.send = function (request) {
-        var response = this._requests[this.getKey(request)];
+        var responses = this.requests[this.getKey(request)] || [];
+        var response = (this.isRepeating ? responses : responses.splice(0, 1))[0];
         if (response != null) {
             return new mockHttpClientSession_1.MockHttpClientSession(request, response);
         }
@@ -29,14 +34,26 @@ var MockHttpClient = /** @class */ (function (_super) {
         }
     };
     MockHttpClient.prototype.mockRequest = function (request, response) {
-        this._requests[this.getKey(request)] = response;
+        if (this.isRepeating) {
+            this.requests[this.getKey(request)] = [response];
+        }
+        else {
+            this.requests[this.getKey(request)] = this.requests[this.getKey(request)] || [];
+            this.requests[this.getKey(request)].push(response);
+        }
     };
     MockHttpClient.prototype.reset = function () {
-        this._requests = {};
+        this.requests = {};
     };
     MockHttpClient.prototype.getKey = function (request) {
-        // TODO(anton): Should we also add body into the key?
-        return request.method + "_" + request.url.toString();
+        var key = request.method + "_" + request.url.toString();
+        if (this.shouldUseHeaders) {
+            key = key + "_" + JSON.stringify(request.headers);
+        }
+        if (this.shouldUseBody) {
+            key = key + "_" + JSON.stringify(request.body);
+        }
+        return key;
     };
     return MockHttpClient;
 }(httpClient_1.HttpClient));
