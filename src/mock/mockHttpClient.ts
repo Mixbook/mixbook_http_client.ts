@@ -3,15 +3,22 @@ import {MockHttpClientSession} from "./mockHttpClientSession";
 import {MockResponse} from "./mockResponse";
 
 export class MockHttpClient extends HttpClient {
-  private _requests: Record<string, IResponse>;
+  public readonly isRepeating: boolean;
+  public readonly shouldUseBody: boolean;
+  public readonly shouldUseHeaders: boolean;
+  public requests: Record<string, IResponse[]>;
 
-  constructor() {
+  constructor(args: {isRepeating?: boolean; shouldUseBody?: boolean; shouldUseHeaders?: boolean} = {}) {
     super();
-    this._requests = {};
+    this.isRepeating = args.isRepeating === undefined ? true : args.isRepeating;
+    this.shouldUseBody = !!args.shouldUseBody;
+    this.shouldUseHeaders = !!args.shouldUseHeaders;
+    this.requests = {};
   }
 
   public send(request: IRequest): MockHttpClientSession {
-    const response = this._requests[this.getKey(request)];
+    const responses = this.requests[this.getKey(request)] || [];
+    const response = (this.isRepeating ? responses : responses.splice(0, 1))[0];
     if (response != null) {
       return new MockHttpClientSession(request, response);
     } else {
@@ -20,15 +27,27 @@ export class MockHttpClient extends HttpClient {
   }
 
   public mockRequest(request: IRequest, response: MockResponse): void {
-    this._requests[this.getKey(request)] = response;
+    if (this.isRepeating) {
+      this.requests[this.getKey(request)] = [response];
+    } else {
+      this.requests[this.getKey(request)] = this.requests[this.getKey(request)] || [];
+      this.requests[this.getKey(request)].push(response);
+    }
   }
 
   public reset(): void {
-    this._requests = {};
+    this.requests = {};
   }
 
   private getKey(request: IRequest): string {
-    // TODO(anton): Should we also add body into the key?
-    return `${request.method}_${request.url.toString()}`;
+    let key = `${request.method}_${request.url.toString()}`;
+    if (this.shouldUseHeaders) {
+      key = `${key}_${JSON.stringify(request.headers)}`;
+    }
+    if (this.shouldUseBody) {
+      key = `${key}_${JSON.stringify(request.body)}`;
+    }
+
+    return key;
   }
 }
