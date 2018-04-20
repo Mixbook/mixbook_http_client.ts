@@ -16,9 +16,21 @@ export class BrowserResponse implements IResponse {
   }
 
   public get arrayBuffer(): Promise<ArrayBuffer> {
-    const response = new Response(this._xhr.response, {status: this._xhr.status, statusText: this._xhr.statusText});
-
-    return response.arrayBuffer();
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.onload = (event: ProgressEvent) => {
+        const target = event.target as FileReader;
+        resolve(target.result);
+      };
+      fileReader.onerror = (event: ProgressEvent) => {
+        reject(new Error("Failed to get the array buffer from response"));
+      };
+      if (this._xhr.response instanceof Blob) {
+        fileReader.readAsArrayBuffer(this._xhr.response);
+      } else {
+        fileReader.readAsArrayBuffer(new Blob());
+      }
+    });
   }
 
   public get json(): any[] | Record<string, any> {

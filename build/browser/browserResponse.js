@@ -15,8 +15,23 @@ var BrowserResponse = /** @class */ (function () {
     });
     Object.defineProperty(BrowserResponse.prototype, "arrayBuffer", {
         get: function () {
-            var response = new Response(this._xhr.response, { status: this._xhr.status, statusText: this._xhr.statusText });
-            return response.arrayBuffer();
+            var _this = this;
+            return new Promise(function (resolve, reject) {
+                var fileReader = new FileReader();
+                fileReader.onload = function (event) {
+                    var target = event.target;
+                    resolve(target.result);
+                };
+                fileReader.onerror = function (event) {
+                    reject(new Error("Failed to get the array buffer from response"));
+                };
+                if (_this._xhr.response instanceof Blob) {
+                    fileReader.readAsArrayBuffer(_this._xhr.response);
+                }
+                else {
+                    fileReader.readAsArrayBuffer(new Blob());
+                }
+            });
         },
         enumerable: true,
         configurable: true
