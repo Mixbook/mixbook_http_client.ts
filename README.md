@@ -1,6 +1,6 @@
 ## mixbook-http-client
 
-HTTP client for a browser and NodeJS apps.
+Composable HTTP client for browser and NodeJS apps.
 
 ### Usage
 
@@ -23,17 +23,16 @@ const client = new NodeHttpClient();
 They all implement the same interface, `IHttpClient`. Then you make a call, like:
 
 ```ts
-const session = client.get("https://www.example.com/coupon/FOOBAR");
+const response = await client.get("https://www.example.com/coupon/FOOBAR");
 ```
 
-All the call methods (`get`, `post`, `send`, etc) immediately return `IHttpClientSession`. It has
-`.promise` getter, which will be resolved to `IResponse`, and also a way to `.abort()` the request and
-track the upload/download progress via `onUploadProgress`/`onDownloadProgress`.
+All the call methods (`get`, `post`, `put`, `delete`) return `Promise<IResponse>`. If you need to
+track the upload/download progress via `onUploadProgress`/`onDownloadProgress`, or be able to abort
+the request, you should use (`send`), it will return `IHttpClientSession`, it has all of that.
 
 ### Testing
 
-There is `MockHttpClient` which also implements `IHttpClient` and its call methods return
-`IHttpClientSession`. You can use it to mock the requests:
+There is `MockHttpClient` which also implements `IHttpClient`.
 
 ```ts
 import {MockHttpClient, MockResponse} from "mixbook-http-client/build/mock";
@@ -47,14 +46,19 @@ const json = (await client.get("https://example.com/coupon/FOOBAR").promise).jso
 expect(json.data).to.eq("ok");
 ```
 
-It only matches mocked requests by URL. It doesn't currently take request headers/body into account.
+By default, it only matches mocked requests by URL. If you want it to take request headers/body into account,
+you can use constructor arguments `shouldUseBody` and `shouldUseHeaders`.
+
+By default, if you make several requests that match the same URL (and optionally headers/body), it will return
+the same mocked response. If you want to test a sequence of requests (like first `/foo` returns `{data: "foo"}`,
+second `/foo` returns `{data: "bar"}`, you can use `isRepeating: false` constructor argument.
 
 ### Retryable client
 
 You can also make your client "retryable" by wrapping it into `RetryableHttpClient`. It also implements
-`IHttpClient` and its call methods return `IHttpClientSession`. It will retry the request if the retry
-condition is true (by default it is - 3 additional attempts for GET requests which are failed or with >=500
-status code), after some delay. It's a proxy class, so you use it by wrapping another http client:
+`IHttpClient`. It will retry the request if the retry condition is true (by default it's - 3 additional
+attempts for GET requests which are failed or with >=500 status code), after some delay. It's a proxy
+class, so you use it by wrapping another http client:
 
 ```ts
 import {BrowserHttpClient} from "mixbook-http-client/build/browser";
@@ -68,3 +72,14 @@ const retryableClient2 = new RetryableHttpClient(new BrowserHttpClient(), {
   delaysInMilliseconds: [500, 1000, 1500],
 });
 ```
+
+### MsgPack client
+
+You can use `MsgPackHttpClient` to talk to APIs, that send MsgPack responses. It also implements
+`IHttpClient`, but in addition it adds some other methods, like `getMsgPack`, `postMsgPack`, `sendMsgPack`.
+Same as `RetryableHttpClient` - it's a proxy, you initialize it by passing another `IHttpClient` as an
+argument.
+
+The reason why it's not part of `HttpClient` base class (which would make some sense) - it depends on `msgpack-lite`,
+which is quite heavy. So, if you don't use `MsgPackHttpClient`, the compressed/gzipped size of `mixbook-http-client`
+will be around 7kb, but if you do use it - around 25kb.

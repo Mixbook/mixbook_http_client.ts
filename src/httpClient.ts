@@ -30,7 +30,15 @@ export interface IHttpClientSession {
   abort(): void;
 }
 
-export abstract class HttpClient {
+export interface IHttpClient {
+  get(url: Url | string, headers?: Record<string, string>): Promise<IResponse>;
+  post(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
+  put(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
+  delete(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
+  send(request: IRequest): IHttpClientSession;
+}
+
+export abstract class HttpClient implements IHttpClient {
   public get(url: Url | string, headers?: Record<string, string>): Promise<IResponse> {
     return this.send({url, method: "GET", headers}).promise;
   }
@@ -49,6 +57,14 @@ export abstract class HttpClient {
     headers?: Record<string, string>
   ): Promise<IResponse> {
     return this.send({url, method: "PUT", body, headers}).promise;
+  }
+
+  public delete(
+    url: Url | string,
+    body: string | Record<string, any>,
+    headers?: Record<string, string>
+  ): Promise<IResponse> {
+    return this.send({url, method: "DELETE", body, headers}).promise;
   }
 
   public abstract send(request: IRequest): IHttpClientSession;
