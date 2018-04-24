@@ -12,6 +12,9 @@ var HttpClient = /** @class */ (function () {
     HttpClient.prototype.put = function (url, body, headers) {
         return this.send({ url: url, method: "PUT", body: body, headers: headers }).promise;
     };
+    HttpClient.prototype.delete = function (url, body, headers) {
+        return this.send({ url: url, method: "DELETE", body: body, headers: headers }).promise;
+    };
     return HttpClient;
 }());
 exports.HttpClient = HttpClient;

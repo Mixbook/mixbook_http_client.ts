@@ -25,9 +25,17 @@ export interface IHttpClientSession {
     promise: Promise<IResponse>;
     abort(): void;
 }
-export declare abstract class HttpClient {
+export interface IHttpClient {
     get(url: Url | string, headers?: Record<string, string>): Promise<IResponse>;
     post(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
     put(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
+    delete(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
+    send(request: IRequest): IHttpClientSession;
+}
+export declare abstract class HttpClient implements IHttpClient {
+    get(url: Url | string, headers?: Record<string, string>): Promise<IResponse>;
+    post(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
+    put(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
+    delete(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
     abstract send(request: IRequest): IHttpClientSession;
 }

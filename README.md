@@ -4,6 +4,9 @@ Composable HTTP client for browser and NodeJS apps.
 
 ### Usage
 
+The idea is - this package offers you a bunch of various `HttpClient` classes, all of them conform
+to the same interface. So you can build your custom uber http client with the features you need.
+
 You create an instance of `HttpClient`, for a browser:
 
 ```ts
@@ -73,6 +76,19 @@ const retryableClient2 = new RetryableHttpClient(new BrowserHttpClient(), {
 });
 ```
 
+### Loggable client
+
+You can make your client "loggable" by wrapping it into `LoggableHttpClient`. It also implements
+`IHttpClient`. It accepts an object, that conforms to `ILoggable` interface (e.g., just a regular
+`console`), and gonna use that object to log information about requests and responses.
+
+```ts
+import {BrowserHttpClient} from "mixbook-http-client/build/browser";
+import {LoggableHttpClient} from "mixbook-http-client/build/loggable";
+
+const loggableClient = new LoggableHttpClient(new BrowserHttpClient(), console);
+```
+
 ### MsgPack client
 
 You can use `MsgPackHttpClient` to talk to APIs, that send MsgPack responses. It also implements
@@ -83,3 +99,23 @@ argument.
 The reason why it's not part of `HttpClient` base class (which would make some sense) - it depends on `msgpack-lite`,
 which is quite heavy. So, if you don't use `MsgPackHttpClient`, the compressed/gzipped size of `mixbook-http-client`
 will be around 7kb, but if you do use it - around 25kb.
+
+### Building an UBER client
+
+So, as an example, you build a client, which has all of those features, like this:
+
+```ts
+import {NodeHttpClient} from "mixbook-http-client/build/node";
+import {MsgPackHttpClient} from "mixbook-http-client/build/msgPackClient";
+import {LoggableHttpClient} from "mixbook-http-client/build/loggable";
+import {RetryableHttpClient} from "mixbook-http-client/build/retryable";
+
+const client = new LoggableHttpClient(
+  new RetryableHttpClient(new MsgPackHttpClient(new NodeHttpClient()), {
+    retryCondition: (request, response, error, retryCount) =>
+      retryCount < 10 && (response == null || response.status >= 400),
+    delaysInMilliseconds: [500, 1000, 1500],
+  }),
+  console
+);
+```
