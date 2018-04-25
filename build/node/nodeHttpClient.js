@@ -25,6 +25,7 @@ var nodeHttpClientSession_1 = require("./nodeHttpClientSession");
 var NodeHttpClient = /** @class */ (function (_super) {
     __extends(NodeHttpClient, _super);
     function NodeHttpClient(headers) {
+        if (headers === void 0) { headers = {}; }
         var _this = _super.call(this) || this;
         _this.headers = headers;
         _this.httpAgent = new Http.Agent({ keepAlive: true, keepAliveMsecs: 5000 });

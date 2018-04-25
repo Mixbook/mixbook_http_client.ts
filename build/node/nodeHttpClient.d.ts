@@ -4,6 +4,6 @@ export declare class NodeHttpClient extends HttpClient {
     private readonly headers;
     private readonly httpAgent;
     private readonly httpsAgent;
-    constructor(headers: Record<string, string>);
+    constructor(headers?: Record<string, string>);
     send(request: IRequest): NodeHttpClientSession;
 }

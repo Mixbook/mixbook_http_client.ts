@@ -3,3 +3,4 @@ coverage
 test
 tslint.json
 .nyc_output
+.vscode
