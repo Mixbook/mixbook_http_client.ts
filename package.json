@@ -1,6 +1,6 @@
 {
   "name": "mixbook-http-client",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Composable Universal TypeScript Http Client",
   "keywords": ["typescript", "http", "xhr", "node", "browser"],
   "homepage": "https://github.com/Mixbook/mixbook_http_client.ts",

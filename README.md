@@ -33,6 +33,8 @@ All the call methods (`get`, `post`, `put`, `delete`) return `Promise<IResponse>
 track the upload/download progress via `onUploadProgress`/`onDownloadProgress`, or be able to abort
 the request, you should use (`send`), it will return `IHttpClientSession`, it has all of that.
 
+[Try it out!](https://runkit.com/embed/h8bg6t9rrbdn)
+
 ### Testing
 
 There is `MockHttpClient` which also implements `IHttpClient`.
