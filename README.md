@@ -1,6 +1,6 @@
 ## mixbook-http-client
 
-Composable HTTP client for browser and NodeJS apps.
+Composable TypeScript HTTP client for browser and NodeJS apps.
 
 ### Usage
 
