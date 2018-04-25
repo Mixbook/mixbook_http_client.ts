@@ -1,7 +1,7 @@
 {
   "name": "mixbook-http-client",
   "version": "0.2.0",
-  "description": "Http Client libraries",
+  "description": "Composable Universal TypeScript Http Client",
   "types": "build",
   "repository": "https://github.com/Mixbook/mixbook_http_client.git",
   "license": "MIT",
