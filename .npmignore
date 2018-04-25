@@ -2,3 +2,4 @@ src
 coverage
 test
 tslint.json
+.nyc_output

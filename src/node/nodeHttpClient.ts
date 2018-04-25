@@ -8,7 +8,7 @@ export class NodeHttpClient extends HttpClient {
   private readonly httpAgent: Http.Agent;
   private readonly httpsAgent: Https.Agent;
 
-  constructor(headers: Record<string, string>) {
+  constructor(headers: Record<string, string> = {}) {
     super();
     this.headers = headers;
     this.httpAgent = new Http.Agent({keepAlive: true, keepAliveMsecs: 5000});
