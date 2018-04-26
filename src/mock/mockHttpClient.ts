@@ -7,18 +7,21 @@ export class MockHttpClient extends HttpClient {
   public readonly shouldUseBody: boolean;
   public readonly shouldUseHeaders: boolean;
   public requests: Record<string, IResponse[]>;
+  public executedRequests: Array<{request: IRequest; response: IResponse}>;
 
   constructor(args: {isRepeating?: boolean; shouldUseBody?: boolean; shouldUseHeaders?: boolean} = {}) {
     super();
     this.isRepeating = args.isRepeating === undefined ? true : args.isRepeating;
     this.shouldUseBody = !!args.shouldUseBody;
     this.shouldUseHeaders = !!args.shouldUseHeaders;
+    this.executedRequests = [];
     this.requests = {};
   }
 
   public send(request: IRequest): MockHttpClientSession {
     const responses = this.requests[this.getKey(request)] || [];
     const response = (this.isRepeating ? responses : responses.splice(0, 1))[0];
+    this.executedRequests.push({request, response});
     if (response != null) {
       return new MockHttpClientSession(request, response);
     } else {
@@ -37,6 +40,7 @@ export class MockHttpClient extends HttpClient {
 
   public reset(): void {
     this.requests = {};
+    this.executedRequests = [];
   }
 
   private getKey(request: IRequest): string {

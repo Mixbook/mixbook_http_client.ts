@@ -20,12 +20,14 @@ var MockHttpClient = /** @class */ (function (_super) {
         _this.isRepeating = args.isRepeating === undefined ? true : args.isRepeating;
         _this.shouldUseBody = !!args.shouldUseBody;
         _this.shouldUseHeaders = !!args.shouldUseHeaders;
+        _this.executedRequests = [];
         _this.requests = {};
         return _this;
     }
     MockHttpClient.prototype.send = function (request) {
         var responses = this.requests[this.getKey(request)] || [];
         var response = (this.isRepeating ? responses : responses.splice(0, 1))[0];
+        this.executedRequests.push({ request: request, response: response });
         if (response != null) {
             return new mockHttpClientSession_1.MockHttpClientSession(request, response);
         }
@@ -44,6 +46,7 @@ var MockHttpClient = /** @class */ (function (_super) {
     };
     MockHttpClient.prototype.reset = function () {
         this.requests = {};
+        this.executedRequests = [];
     };
     MockHttpClient.prototype.getKey = function (request) {
         var key = request.method + "_" + request.url.toString();

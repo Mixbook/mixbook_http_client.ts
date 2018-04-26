@@ -49,6 +49,7 @@ client.mockRequest(
 );
 const json = (await client.get("https://example.com/coupon/FOOBAR").promise).json;
 expect(json.data).to.eq("ok");
+expect(client.executedRequests.filter(r => r.request.url === "https://example.com/coupon/FOOBAR").length).to.eq(1);
 ```
 
 By default, it only matches mocked requests by URL. If you want it to take request headers/body into account,

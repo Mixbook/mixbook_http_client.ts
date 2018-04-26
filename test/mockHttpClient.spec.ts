@@ -28,6 +28,19 @@ describe("MockHttpClient", () => {
         expect(response1.text).to.eq(result);
         expect(response2.text).to.eq(result);
       });
+
+      it("records executed calls", async () => {
+        const client = new MockHttpClient();
+        const resultJson = {foo: "bar"};
+        const result = JSON.stringify(resultJson);
+        client.mockRequest({url: "/foo", method: "GET"}, new MockResponse(200, result, {"content-type": "foo"}));
+        const response1 = await client.get("/foo");
+        const response2 = await client.get("/foo");
+        expect(client.executedRequests.map(r => [r.request.url, r.response.text])).to.eql([
+          ["/foo", result],
+          ["/foo", result],
+        ]);
+      });
     });
 
     context("when returning a Buffer", () => {

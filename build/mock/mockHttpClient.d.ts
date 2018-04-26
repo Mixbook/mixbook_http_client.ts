@@ -6,6 +6,10 @@ export declare class MockHttpClient extends HttpClient {
     readonly shouldUseBody: boolean;
     readonly shouldUseHeaders: boolean;
     requests: Record<string, IResponse[]>;
+    executedRequests: {
+        request: IRequest;
+        response: IResponse;
+    }[];
     constructor(args?: {
         isRepeating?: boolean;
         shouldUseBody?: boolean;
