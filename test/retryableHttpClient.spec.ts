@@ -2,6 +2,7 @@ import {expect} from "chai";
 import {MockHttpClient} from "../src/mock/mockHttpClient";
 import {RetryableHttpClient} from "../src/retryable/retryableHttpClient";
 import {MockResponse} from "../src/mock/mockResponse";
+import {NodeHttpClient} from "../src/node";
 
 describe("RetryableHttpClient", () => {
   it("makes a call with custom retry condition and delaysInMilliseconds", async () => {

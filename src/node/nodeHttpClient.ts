@@ -7,10 +7,12 @@ export class NodeHttpClient extends HttpClient {
   private readonly headers: Record<string, string>;
   private readonly httpAgent: Http.Agent;
   private readonly httpsAgent: Https.Agent;
+  private readonly timeout?: number;
 
-  constructor(headers: Record<string, string> = {}) {
+  constructor(args: {headers?: Record<string, string>; timeout?: number} = {}) {
     super();
-    this.headers = headers;
+    this.headers = args.headers || {};
+    this.timeout = args.timeout;
     this.httpAgent = new Http.Agent({keepAlive: true, keepAliveMsecs: 5000});
     this.httpsAgent = new Https.Agent({keepAlive: true, keepAliveMsecs: 5000});
   }
@@ -22,6 +24,7 @@ export class NodeHttpClient extends HttpClient {
       actualRequest.headers = actualRequest.headers || {};
       actualRequest.headers.Cookie = this.headers.cookie;
     }
+    actualRequest.timeout = actualRequest.timeout || this.timeout || 60000;
     session.start(actualRequest);
 
     return session;

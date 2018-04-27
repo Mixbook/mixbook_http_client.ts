@@ -63,6 +63,9 @@ var BrowserHttpClientSession = /** @class */ (function () {
             var headers, _i, _a, headerName, body, _b, _c, name_1;
             return __generator(this, function (_d) {
                 this._xhr.open(request.method, request.url.toString());
+                if (request.timeout != null) {
+                    this._xhr.timeout = request.timeout;
+                }
                 headers = request.headers || {};
                 if (headers != null) {
                     for (_i = 0, _a = Object.getOwnPropertyNames(headers); _i < _a.length; _i++) {

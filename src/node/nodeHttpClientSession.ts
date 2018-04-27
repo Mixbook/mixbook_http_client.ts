@@ -63,6 +63,18 @@ export class NodeHttpClientSession implements IHttpClientSession {
           ? Https.request(this.requestOptions(url, request), handler)
           : Http.request(this.requestOptions(url, request), handler);
 
+      const timeout = request.timeout;
+      if (timeout != null && timeout > 0) {
+        rawRequest.on("socket", () => {
+          // tslint:disable-next-line no-string-based-set-timeout
+          rawRequest.setTimeout(timeout);
+          rawRequest.on("timeout", () => {
+            rawRequest.abort();
+            reject(new Error("Timeout"));
+          });
+        });
+      }
+
       if (request.headers != null) {
         for (const headerName of Object.getOwnPropertyNames(request.headers)) {
           rawRequest.setHeader(headerName, request.headers[headerName]);
@@ -104,7 +116,6 @@ export class NodeHttpClientSession implements IHttpClientSession {
     const port = doesHavePort ? url.port : url.scheme === "https" ? 443 : 80;
 
     return {
-      timeout: 30000,
       method: request.method,
       host: url.host,
       port,

@@ -29,9 +29,9 @@ They all implement the same interface, `IHttpClient`. Then you make a call, like
 const response = await client.get("https://www.example.com/coupon/FOOBAR");
 ```
 
-All the call methods (`get`, `post`, `put`, `delete`) return `Promise<IResponse>`. If you need to
-track the upload/download progress via `onUploadProgress`/`onDownloadProgress`, or be able to abort
-the request, you should use (`send`), it will return `IHttpClientSession`, it has all of that.
+All the call methods (`get`, `post`, `put`, `delete`) return `Promise<IResponse>`. If you need to track the
+upload/download progress via `onUploadProgress`/`onDownloadProgress`, or be able to abort the request, or
+set the request timeout, you should use (`send`), it will return `IHttpClientSession`, it has all of that.
 
 [Try it out!](https://runkit.com/embed/h8bg6t9rrbdn)
 

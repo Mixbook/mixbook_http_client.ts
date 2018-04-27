@@ -24,10 +24,11 @@ var httpClient_1 = require("../httpClient");
 var nodeHttpClientSession_1 = require("./nodeHttpClientSession");
 var NodeHttpClient = /** @class */ (function (_super) {
     __extends(NodeHttpClient, _super);
-    function NodeHttpClient(headers) {
-        if (headers === void 0) { headers = {}; }
+    function NodeHttpClient(args) {
+        if (args === void 0) { args = {}; }
         var _this = _super.call(this) || this;
-        _this.headers = headers;
+        _this.headers = args.headers || {};
+        _this.timeout = args.timeout;
         _this.httpAgent = new Http.Agent({ keepAlive: true, keepAliveMsecs: 5000 });
         _this.httpsAgent = new Https.Agent({ keepAlive: true, keepAliveMsecs: 5000 });
         return _this;
@@ -39,6 +40,7 @@ var NodeHttpClient = /** @class */ (function (_super) {
             actualRequest.headers = actualRequest.headers || {};
             actualRequest.headers.Cookie = this.headers.cookie;
         }
+        actualRequest.timeout = actualRequest.timeout || this.timeout || 60000;
         session.start(actualRequest);
         return session;
     };

@@ -8,6 +8,7 @@ export interface IRequest {
   method: THttpMethod;
   body?: string | Record<string, any>;
   headers?: Record<string, string>;
+  timeout?: number;
 }
 
 export interface IResponse {

@@ -31,6 +31,10 @@ export class BrowserHttpClientSession implements IHttpClientSession {
   public async start(request: IRequest): Promise<void> {
     this._xhr.open(request.method, request.url.toString());
 
+    if (request.timeout != null) {
+      this._xhr.timeout = request.timeout;
+    }
+
     const headers = request.headers || {};
 
     if (headers != null) {

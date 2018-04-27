@@ -57,6 +57,17 @@ var NodeHttpClientSession = /** @class */ (function () {
             var rawRequest = url.scheme === "https"
                 ? Https.request(_this.requestOptions(url, request), handler)
                 : Http.request(_this.requestOptions(url, request), handler);
+            var timeout = request.timeout;
+            if (timeout != null && timeout > 0) {
+                rawRequest.on("socket", function () {
+                    // tslint:disable-next-line no-string-based-set-timeout
+                    rawRequest.setTimeout(timeout);
+                    rawRequest.on("timeout", function () {
+                        rawRequest.abort();
+                        reject(new Error("Timeout"));
+                    });
+                });
+            }
             if (request.headers != null) {
                 for (var _i = 0, _a = Object.getOwnPropertyNames(request.headers); _i < _a.length; _i++) {
                     var headerName = _a[_i];
@@ -94,7 +105,6 @@ var NodeHttpClientSession = /** @class */ (function () {
         var doesHavePort = url.port != null;
         var port = doesHavePort ? url.port : url.scheme === "https" ? 443 : 80;
         return {
-            timeout: 30000,
             method: request.method,
             host: url.host,
             port: port,
