@@ -1,6 +1,11 @@
-import { HttpClient, IRequest, IResponse } from "../httpClient";
+import { HttpClient, IHttpClientArgs, IRequest, IResponse } from "../httpClient";
 import { MockHttpClientSession } from "./mockHttpClientSession";
 import { MockResponse } from "./mockResponse";
+export interface IMockHttpClientArgs {
+    isRepeating?: boolean;
+    shouldUseBody?: boolean;
+    shouldUseHeaders?: boolean;
+}
 export declare class MockHttpClient extends HttpClient {
     readonly isRepeating: boolean;
     readonly shouldUseBody: boolean;
@@ -10,12 +15,9 @@ export declare class MockHttpClient extends HttpClient {
         request: IRequest;
         response: IResponse;
     }>;
-    constructor(args?: {
-        isRepeating?: boolean;
-        shouldUseBody?: boolean;
-        shouldUseHeaders?: boolean;
-    });
+    constructor(args?: IHttpClientArgs & IMockHttpClientArgs);
     send(request: IRequest): MockHttpClientSession;
+    copy(args?: IHttpClientArgs & IMockHttpClientArgs): MockHttpClient;
     mockRequest(request: IRequest, response: MockResponse): void;
     reset(): void;
     private getKey(request);

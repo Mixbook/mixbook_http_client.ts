@@ -23,12 +23,8 @@ var browserHttpClientSession_1 = require("./browserHttpClientSession");
 /* istanbul ignore next */
 var BrowserHttpClient = /** @class */ (function (_super) {
     __extends(BrowserHttpClient, _super);
-    function BrowserHttpClient(args) {
-        if (args === void 0) { args = {}; }
-        var _this = _super.call(this) || this;
-        _this.headers = args.headers || {};
-        _this.timeout = args.timeout;
-        return _this;
+    function BrowserHttpClient() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     BrowserHttpClient.prototype.send = function (request) {
         var session = new browserHttpClientSession_1.BrowserHttpClientSession();
@@ -40,6 +36,10 @@ var BrowserHttpClient = /** @class */ (function (_super) {
         actualRequest.timeout = actualRequest.timeout || this.timeout;
         session.start(actualRequest);
         return session;
+    };
+    BrowserHttpClient.prototype.copy = function (args) {
+        if (args === void 0) { args = {}; }
+        return new BrowserHttpClient(__assign({ headers: this.headers, timeout: this.timeout }, args));
     };
     return BrowserHttpClient;
 }(httpClient_1.HttpClient));

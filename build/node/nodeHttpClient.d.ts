@@ -1,13 +1,9 @@
-import { HttpClient, IRequest } from "../httpClient";
+import { HttpClient, IHttpClientArgs, IRequest } from "../httpClient";
 import { NodeHttpClientSession } from "./nodeHttpClientSession";
 export declare class NodeHttpClient extends HttpClient {
-    private readonly headers;
     private readonly httpAgent;
     private readonly httpsAgent;
-    private readonly timeout?;
-    constructor(args?: {
-        headers?: Record<string, string>;
-        timeout?: number;
-    });
+    constructor(args?: IHttpClientArgs);
     send(request: IRequest): NodeHttpClientSession;
+    copy(args?: IHttpClientArgs): NodeHttpClient;
 }

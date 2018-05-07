@@ -1,17 +1,8 @@
-import {HttpClient, IHttpClientSession, IRequest} from "../httpClient";
+import {HttpClient, IHttpClientArgs, IHttpClientSession, IRequest} from "../httpClient";
 import {BrowserHttpClientSession} from "./browserHttpClientSession";
 
 /* istanbul ignore next */
 export class BrowserHttpClient extends HttpClient {
-  private readonly headers: Record<string, string>;
-  private readonly timeout?: number;
-
-  constructor(args: {headers?: Record<string, string>; timeout?: number} = {}) {
-    super();
-    this.headers = args.headers || {};
-    this.timeout = args.timeout;
-  }
-
   public send(request: IRequest): IHttpClientSession {
     const session = new BrowserHttpClientSession();
     const actualRequest = {...request};
@@ -23,5 +14,9 @@ export class BrowserHttpClient extends HttpClient {
     session.start(actualRequest);
 
     return session;
+  }
+
+  public copy(args: IHttpClientArgs = {}): BrowserHttpClient {
+    return new BrowserHttpClient({headers: this.headers, timeout: this.timeout, ...args});
   }
 }

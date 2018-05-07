@@ -66,6 +66,10 @@ var MsgPackHttpClient = /** @class */ (function (_super) {
     MsgPackHttpClient.prototype.send = function (request) {
         return this._client.send(request);
     };
+    MsgPackHttpClient.prototype.copy = function (args) {
+        if (args === void 0) { args = {}; }
+        return new MsgPackHttpClient(this._client.copy(args));
+    };
     MsgPackHttpClient.prototype.getMsgPack = function (url, headers) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {

@@ -44,6 +44,10 @@ var LoggableHttpClient = /** @class */ (function (_super) {
         });
         return session;
     };
+    LoggableHttpClient.prototype.copy = function (args) {
+        if (args === void 0) { args = {}; }
+        return new LoggableHttpClient(this._client.copy(args), this._logger);
+    };
     LoggableHttpClient.prototype.formatBody = function (str) {
         if (str.length > 1000) {
             return str.substr(0, 1000) + "...";

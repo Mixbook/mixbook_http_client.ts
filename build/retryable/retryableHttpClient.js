@@ -30,6 +30,13 @@ var RetryableHttpClient = /** @class */ (function (_super) {
         session.start();
         return session;
     };
+    RetryableHttpClient.prototype.copy = function (args) {
+        if (args === void 0) { args = {}; }
+        return new RetryableHttpClient(this._client.copy(args), {
+            retryCondition: this._retryCondition,
+            delaysInMilliseconds: this._delaysInMilliseconds,
+        });
+    };
     return RetryableHttpClient;
 }(httpClient_1.HttpClient));
 exports.RetryableHttpClient = RetryableHttpClient;

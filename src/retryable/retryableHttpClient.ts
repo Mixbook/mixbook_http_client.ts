@@ -1,4 +1,4 @@
-import {HttpClient, IHttpClientSession, IRequest, IResponse} from "../httpClient";
+import {HttpClient, IHttpClientArgs, IHttpClientSession, IRequest, IResponse} from "../httpClient";
 import {Maybe} from "../types";
 import {RetryableHttpClientSession} from "./retryableHttpClientSession";
 
@@ -46,5 +46,12 @@ export class RetryableHttpClient extends HttpClient {
     session.start();
 
     return session;
+  }
+
+  public copy(args: IHttpClientArgs = {}): RetryableHttpClient {
+    return new RetryableHttpClient(this._client.copy(args), {
+      retryCondition: this._retryCondition,
+      delaysInMilliseconds: this._delaysInMilliseconds,
+    });
   }
 }

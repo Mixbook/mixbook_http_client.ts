@@ -1,7 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var HttpClient = /** @class */ (function () {
-    function HttpClient() {
+    function HttpClient(args) {
+        if (args === void 0) { args = {}; }
+        this.headers = args.headers || {};
+        this.timeout = args.timeout;
     }
     HttpClient.prototype.get = function (url, headers) {
         return this.send({ url: url, method: "GET", headers: headers }).promise;

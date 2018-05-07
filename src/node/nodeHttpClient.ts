@@ -1,18 +1,14 @@
 import * as Http from "http";
 import * as Https from "https";
-import {HttpClient, IRequest} from "../httpClient";
+import {HttpClient, IHttpClientArgs, IRequest} from "../httpClient";
 import {NodeHttpClientSession} from "./nodeHttpClientSession";
 
 export class NodeHttpClient extends HttpClient {
-  private readonly headers: Record<string, string>;
   private readonly httpAgent: Http.Agent;
   private readonly httpsAgent: Https.Agent;
-  private readonly timeout?: number;
 
-  constructor(args: {headers?: Record<string, string>; timeout?: number} = {}) {
-    super();
-    this.headers = args.headers || {};
-    this.timeout = args.timeout;
+  constructor(args: IHttpClientArgs = {}) {
+    super(args);
     this.httpAgent = new Http.Agent({keepAlive: true, keepAliveMsecs: 5000});
     this.httpsAgent = new Https.Agent({keepAlive: true, keepAliveMsecs: 5000});
   }
@@ -28,5 +24,9 @@ export class NodeHttpClient extends HttpClient {
     session.start(actualRequest);
 
     return session;
+  }
+
+  public copy(args: IHttpClientArgs = {}): NodeHttpClient {
+    return new NodeHttpClient({headers: this.headers, timeout: this.timeout, ...args});
   }
 }

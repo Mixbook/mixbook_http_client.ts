@@ -26,9 +26,7 @@ var NodeHttpClient = /** @class */ (function (_super) {
     __extends(NodeHttpClient, _super);
     function NodeHttpClient(args) {
         if (args === void 0) { args = {}; }
-        var _this = _super.call(this) || this;
-        _this.headers = args.headers || {};
-        _this.timeout = args.timeout;
+        var _this = _super.call(this, args) || this;
         _this.httpAgent = new Http.Agent({ keepAlive: true, keepAliveMsecs: 5000 });
         _this.httpsAgent = new Https.Agent({ keepAlive: true, keepAliveMsecs: 5000 });
         return _this;
@@ -43,6 +41,10 @@ var NodeHttpClient = /** @class */ (function (_super) {
         actualRequest.timeout = actualRequest.timeout || this.timeout || 60000;
         session.start(actualRequest);
         return session;
+    };
+    NodeHttpClient.prototype.copy = function (args) {
+        if (args === void 0) { args = {}; }
+        return new NodeHttpClient(__assign({ headers: this.headers, timeout: this.timeout }, args));
     };
     return NodeHttpClient;
 }(httpClient_1.HttpClient));

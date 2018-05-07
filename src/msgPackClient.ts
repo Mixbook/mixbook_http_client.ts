@@ -1,6 +1,6 @@
 import * as MsgPack from "msgpack-lite";
 
-import {HttpClient, IHttpClientSession, IRequest} from "./httpClient";
+import {HttpClient, IHttpClientArgs, IHttpClientSession, IRequest} from "./httpClient";
 import {Url} from "./url";
 
 /* istanbul ignore next */
@@ -14,6 +14,10 @@ export class MsgPackHttpClient extends HttpClient {
 
   public send(request: IRequest): IHttpClientSession {
     return this._client.send(request);
+  }
+
+  public copy(args: IHttpClientArgs = {}): MsgPackHttpClient {
+    return new MsgPackHttpClient(this._client.copy(args));
   }
 
   public async getMsgPack<T>(url: Url | string, headers?: Record<string, string>): Promise<T> {

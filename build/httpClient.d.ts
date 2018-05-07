@@ -26,6 +26,10 @@ export interface IHttpClientSession {
     promise: Promise<IResponse>;
     abort(): void;
 }
+export interface IHttpClientArgs {
+    headers?: Record<string, string>;
+    timeout?: number;
+}
 export interface IHttpClient {
     get(url: Url | string, headers?: Record<string, string>): Promise<IResponse>;
     post(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
@@ -34,9 +38,13 @@ export interface IHttpClient {
     send(request: IRequest): IHttpClientSession;
 }
 export declare abstract class HttpClient implements IHttpClient {
+    protected readonly headers: Record<string, string>;
+    protected readonly timeout?: number;
+    constructor(args?: IHttpClientArgs);
     get(url: Url | string, headers?: Record<string, string>): Promise<IResponse>;
     post(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
     put(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
     delete(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
+    abstract copy(args?: IHttpClientArgs): HttpClient;
     abstract send(request: IRequest): IHttpClientSession;
 }

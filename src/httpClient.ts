@@ -31,6 +31,11 @@ export interface IHttpClientSession {
   abort(): void;
 }
 
+export interface IHttpClientArgs {
+  headers?: Record<string, string>;
+  timeout?: number;
+}
+
 export interface IHttpClient {
   get(url: Url | string, headers?: Record<string, string>): Promise<IResponse>;
   post(url: Url | string, body: string | Record<string, any>, headers?: Record<string, string>): Promise<IResponse>;
@@ -40,6 +45,14 @@ export interface IHttpClient {
 }
 
 export abstract class HttpClient implements IHttpClient {
+  protected readonly headers: Record<string, string>;
+  protected readonly timeout?: number;
+
+  constructor(args: IHttpClientArgs = {}) {
+    this.headers = args.headers || {};
+    this.timeout = args.timeout;
+  }
+
   public get(url: Url | string, headers?: Record<string, string>): Promise<IResponse> {
     return this.send({url, method: "GET", headers}).promise;
   }
@@ -68,5 +81,6 @@ export abstract class HttpClient implements IHttpClient {
     return this.send({url, method: "DELETE", body, headers}).promise;
   }
 
+  public abstract copy(args?: IHttpClientArgs): HttpClient;
   public abstract send(request: IRequest): IHttpClientSession;
 }

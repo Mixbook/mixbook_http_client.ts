@@ -1,4 +1,4 @@
-import {HttpClient, IHttpClientSession, IRequest} from "../index";
+import {HttpClient, IHttpClientArgs, IHttpClientSession, IRequest} from "../index";
 
 export interface ILogger {
   debug(record: string): void;
@@ -39,6 +39,10 @@ export class LoggableHttpClient extends HttpClient {
     });
 
     return session;
+  }
+
+  public copy(args: IHttpClientArgs = {}): LoggableHttpClient {
+    return new LoggableHttpClient(this._client.copy(args), this._logger);
   }
 
   private formatBody(str: string): string {

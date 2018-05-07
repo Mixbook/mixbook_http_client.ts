@@ -1,4 +1,4 @@
-import { HttpClient, IHttpClientSession, IRequest, IResponse } from "../httpClient";
+import { HttpClient, IHttpClientArgs, IHttpClientSession, IRequest, IResponse } from "../httpClient";
 import { Maybe } from "../types";
 export declare type RetryCondition = (request: IRequest, response: Maybe<IResponse>, error: Maybe<any>, retryCount: number) => boolean;
 export declare class RetryableHttpClient extends HttpClient {
@@ -11,4 +11,5 @@ export declare class RetryableHttpClient extends HttpClient {
         delaysInMilliseconds?: number[];
     });
     send(request: IRequest): IHttpClientSession;
+    copy(args?: IHttpClientArgs): RetryableHttpClient;
 }
