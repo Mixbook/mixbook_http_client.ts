@@ -52,9 +52,6 @@ export class NodeHttpClientSession implements IHttpClientSession {
         res.on("end", () => {
           resolve(new NodeResponse(res, isBinary ? Buffer.concat(bodyBuffer) : bodyString));
         });
-        rawRequest.on("error", error => {
-          reject(error);
-        });
       };
 
       const url = request.url instanceof Url ? request.url : Url.fromString(request.url);
@@ -62,6 +59,10 @@ export class NodeHttpClientSession implements IHttpClientSession {
         url.scheme === "https"
           ? Https.request(this.requestOptions(url, request), handler)
           : Http.request(this.requestOptions(url, request), handler);
+
+      rawRequest.on("error", error => {
+        reject(error);
+      });
 
       const timeout = request.timeout;
       if (timeout != null && timeout > 0) {

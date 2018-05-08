@@ -49,14 +49,14 @@ var NodeHttpClientSession = /** @class */ (function () {
                 res.on("end", function () {
                     resolve(new nodeResponse_1.NodeResponse(res, isBinary ? Buffer.concat(bodyBuffer) : bodyString));
                 });
-                rawRequest.on("error", function (error) {
-                    reject(error);
-                });
             };
             var url = request.url instanceof url_1.Url ? request.url : url_1.Url.fromString(request.url);
             var rawRequest = url.scheme === "https"
                 ? Https.request(_this.requestOptions(url, request), handler)
                 : Http.request(_this.requestOptions(url, request), handler);
+            rawRequest.on("error", function (error) {
+                reject(error);
+            });
             var timeout = request.timeout;
             if (timeout != null && timeout > 0) {
                 rawRequest.on("socket", function () {
