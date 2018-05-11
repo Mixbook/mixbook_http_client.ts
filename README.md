@@ -1,4 +1,4 @@
-## mixbook-http-client
+## mixbook-http-client [![Build Status](https://travis-ci.org/Mixbook/mixbook_http_client.ts.svg?branch=master)](https://travis-ci.org/Mixbook/mixbook_http_client.ts) [![npm package](https://img.shields.io/npm/v/mixbook-http-client.svg?style=flat-square)](https://www.npmjs.org/package/mixbook-http-client)
 
 Composable TypeScript HTTP client for browser and NodeJS apps, with built-in mocking and "middlewares" support.
 
