@@ -205,6 +205,12 @@ function normalizePath(path) {
             parsed.port = portMatch[1];
             url = url.substr(parsed.port.length + 1);
         }
+        var hashMatcher = /#([^\#]*)$/;
+        var hashMatch = hashMatcher.exec(url);
+        if (hashMatch != null) {
+            parsed.hash = hashMatch[1];
+            url = url.replace(hashMatcher, "");
+        }
         var paramsMatcher = /\?(.+)$/;
         var paramsMatch = paramsMatcher.exec(url);
         if (paramsMatch != null) {
@@ -213,12 +219,6 @@ function normalizePath(path) {
         }
         else {
             parsed.params = {};
-        }
-        var hashMatcher = /^#(.+)$/;
-        var hashMatch = hashMatcher.exec(url);
-        if (hashMatch != null) {
-            parsed.hash = hashMatch[1];
-            url = url.substr(parsed.hash.length + 1);
         }
         parsed.path = normalizePath(url);
         return new Url(parsed);

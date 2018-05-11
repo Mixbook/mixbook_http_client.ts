@@ -64,6 +64,25 @@ describe("Url", () => {
     it("parses with params and port and trailing slash", () => {
       expect(builder("example.com:3000/?foo=bar")).to.eq("//example.com:3000/foo?foo=bar");
     });
+
+    it("doesn't add hash to the path", () => {
+      const url = Url.fromString("http://example.com/foo/bar#");
+      expect(url.path).to.eq("/foo/bar");
+      expect(url.hash).to.eq("");
+    });
+
+    it("extracts hash correctly without params", () => {
+      const url = Url.fromString("http://example.com/foo/bar#foo");
+      expect(url.path).to.eq("/foo/bar");
+      expect(url.hash).to.eq("foo");
+    });
+
+    it("extracts hash correctly with params", () => {
+      const url = Url.fromString("http://example.com/foo/bar?a=b#foo");
+      expect(url.path).to.eq("/foo/bar");
+      expect(url.params).to.eql({a: "b"});
+      expect(url.hash).to.eq("foo");
+    });
   });
 
   describe("#appendPath()", () => {

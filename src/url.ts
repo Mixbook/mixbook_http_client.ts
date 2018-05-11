@@ -187,6 +187,13 @@ export namespace Url {
       url = url.substr(parsed.port.length + 1);
     }
 
+    const hashMatcher = /#([^\#]*)$/;
+    const hashMatch = hashMatcher.exec(url);
+    if (hashMatch != null) {
+      parsed.hash = hashMatch[1];
+      url = url.replace(hashMatcher, "");
+    }
+
     const paramsMatcher = /\?(.+)$/;
     const paramsMatch = paramsMatcher.exec(url);
     if (paramsMatch != null) {
@@ -194,13 +201,6 @@ export namespace Url {
       url = url.replace(paramsMatcher, "");
     } else {
       parsed.params = {};
-    }
-
-    const hashMatcher = /^#(.+)$/;
-    const hashMatch = hashMatcher.exec(url);
-    if (hashMatch != null) {
-      parsed.hash = hashMatch[1];
-      url = url.substr(parsed.hash.length + 1);
     }
 
     parsed.path = normalizePath(url);
