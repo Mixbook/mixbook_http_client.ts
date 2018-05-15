@@ -35,7 +35,11 @@ export class LoggableHttpClient extends HttpClient {
       } else {
         this._logger.warn(msg);
       }
-      this._logger.debug(`Completed with body: ${this.formatBody(response.text)}`);
+      try {
+        this._logger.debug(`Completed with body: ${this.formatBody(response.text)}`);
+      } catch (_) {
+        // In case it's a binary response, it may throw. This is fine, just do nothing then.
+      }
     });
 
     return session;

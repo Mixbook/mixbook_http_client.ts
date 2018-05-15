@@ -40,7 +40,12 @@ var LoggableHttpClient = /** @class */ (function (_super) {
             else {
                 _this._logger.warn(msg);
             }
-            _this._logger.debug("Completed with body: " + _this.formatBody(response.text));
+            try {
+                _this._logger.debug("Completed with body: " + _this.formatBody(response.text));
+            }
+            catch (_) {
+                // In case it's a binary response, it may throw. This is fine, just do nothing then.
+            }
         });
         return session;
     };
