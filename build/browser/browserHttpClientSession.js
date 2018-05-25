@@ -42,24 +42,23 @@ var browserResponse_1 = require("./browserResponse");
 /* istanbul ignore next */
 var BrowserHttpClientSession = /** @class */ (function () {
     function BrowserHttpClientSession() {
-        var _this = this;
         this.onUploadProgress = new stream_1.Stream();
         this.onDownloadProgress = new stream_1.Stream();
         this._xhr = new XMLHttpRequest();
         this.onUploadProgress = new stream_1.Stream();
         this.onDownloadProgress = new stream_1.Stream();
-        this.promise = new Promise(function (resolve, reject) {
-            _this._xhr.upload.onprogress = functionUtils_1.FunctionUtils.throttle(function (e) { return _this.onUploadProgress.push(e); }, 1000);
-            _this._xhr.onprogress = functionUtils_1.FunctionUtils.throttle(function (e) { return _this.onDownloadProgress.push(e); }, 1000);
-            _this._xhr.onerror = function (e) { return reject(new Error("Failed")); };
-            _this._xhr.ontimeout = function (e) { return reject(new Error("Timeout")); };
-            _this._xhr.onload = function (e) {
-                resolve(new browserResponse_1.BrowserResponse(_this._xhr));
-            };
-        });
     }
+    Object.defineProperty(BrowserHttpClientSession.prototype, "promise", {
+        get: function () {
+            // TODO: Revise it, try avoid using !
+            return this._promise;
+        },
+        enumerable: true,
+        configurable: true
+    });
     BrowserHttpClientSession.prototype.start = function (request) {
         return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
             var headers, _i, _a, headerName, body, _b, _c, name_1;
             return __generator(this, function (_d) {
                 this._xhr.open(request.method, request.url.toString());
@@ -89,6 +88,15 @@ var BrowserHttpClientSession = /** @class */ (function () {
                     this._xhr.responseType = "blob";
                 }
                 this._xhr.send(body);
+                this._promise = new Promise(function (resolve, reject) {
+                    _this._xhr.upload.onprogress = functionUtils_1.FunctionUtils.throttle(function (e) { return _this.onUploadProgress.push(e); }, 1000);
+                    _this._xhr.onprogress = functionUtils_1.FunctionUtils.throttle(function (e) { return _this.onDownloadProgress.push(e); }, 1000);
+                    _this._xhr.onerror = function (e) { return reject(new Error("Failed request to " + request.url.toString())); };
+                    _this._xhr.ontimeout = function (e) { return reject(new Error("Request to " + request.url.toString() + " timed out")); };
+                    _this._xhr.onload = function (e) {
+                        resolve(new browserResponse_1.BrowserResponse(_this._xhr));
+                    };
+                });
                 return [2 /*return*/];
             });
         });

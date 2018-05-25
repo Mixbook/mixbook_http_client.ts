@@ -71,7 +71,7 @@ export class NodeHttpClientSession implements IHttpClientSession {
           rawRequest.setTimeout(timeout);
           rawRequest.on("timeout", () => {
             rawRequest.abort();
-            reject(new Error("Timeout"));
+            reject(new Error(`Request to ${url.toString()} timed out`));
           });
         });
       }

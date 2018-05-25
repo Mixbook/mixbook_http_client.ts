@@ -64,7 +64,7 @@ var NodeHttpClientSession = /** @class */ (function () {
                     rawRequest.setTimeout(timeout);
                     rawRequest.on("timeout", function () {
                         rawRequest.abort();
-                        reject(new Error("Timeout"));
+                        reject(new Error("Request to " + url.toString() + " timed out"));
                     });
                 });
             }
