@@ -94,7 +94,11 @@ var Url = /** @class */ (function () {
     });
     Object.defineProperty(Url.prototype, "path", {
         get: function () {
-            return this.parts.path || "";
+            var path = this.parts.path || "";
+            if (path[0] !== "/") {
+                path = "/" + path;
+            }
+            return path;
         },
         enumerable: true,
         configurable: true

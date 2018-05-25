@@ -9,6 +9,15 @@ describe("Url", () => {
         .toString();
     };
 
+    it("normalizes path by adding a leading slash", () => {
+      expect(Url.fromString("https://example.com").path).to.eq("/");
+      expect(Url.fromString("https://example.com/").path).to.eq("/");
+      expect(Url.fromString("https://example.com/foo").path).to.eq("/foo");
+      expect(Url.fromString("https://example.com/foo/bar").path).to.eq("/foo/bar");
+      expect(Url.fromString("/foo/bar").path).to.eq("/foo/bar");
+      expect(Url.fromString("").path).to.eq("/");
+    });
+
     it("parses with path only", () => {
       expect(builder("/bar")).to.eq("/bar/foo");
     });

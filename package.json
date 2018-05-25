@@ -1,6 +1,6 @@
 {
   "name": "mixbook-http-client",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description":
     "Composable TypeScript HTTP client for browser and NodeJS apps, with built-in mocking and 'middlewares' support",
   "keywords": ["typescript", "http", "xhr", "node", "browser"],

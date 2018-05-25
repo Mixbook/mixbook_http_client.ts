@@ -94,7 +94,12 @@ export class Url {
   }
 
   get path(): string {
-    return this.parts.path || "";
+    let path = this.parts.path || "";
+    if (path[0] !== "/") {
+      path = `/${path}`;
+    }
+
+    return path;
   }
 
   get baseName(): string {
