@@ -61,7 +61,7 @@ export class NodeHttpClientSession implements IHttpClientSession {
           : Http.request(this.requestOptions(url, request), handler);
 
       rawRequest.on("error", error => {
-        reject(error);
+        reject(new Error(`Request to ${url.toString()} failed: ${error.message}`));
       });
 
       const timeout = request.timeout;
