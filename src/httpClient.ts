@@ -13,7 +13,7 @@ export interface IRequest {
 
 export interface IResponse {
   text: string;
-  arrayBuffer: Promise<ArrayBuffer | Buffer>;
+  arrayBuffer: Promise<ArrayBuffer | Uint8Array>;
   json: Record<string, any>;
   status: number;
   headers: Record<string, string>;

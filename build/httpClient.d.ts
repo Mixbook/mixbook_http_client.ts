@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Stream } from "./stream";
 import { Url } from "./url";
 export declare type THttpMethod = "GET" | "POST" | "PUT" | "HEAD" | "PATCH" | "DELETE";
@@ -11,7 +10,7 @@ export interface IRequest {
 }
 export interface IResponse {
     text: string;
-    arrayBuffer: Promise<ArrayBuffer | Buffer>;
+    arrayBuffer: Promise<ArrayBuffer | Uint8Array>;
     json: Record<string, any>;
     status: number;
     headers: Record<string, string>;
