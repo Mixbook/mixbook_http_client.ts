@@ -55,7 +55,7 @@ var NodeHttpClientSession = /** @class */ (function () {
                 ? Https.request(_this.requestOptions(url, request), handler)
                 : Http.request(_this.requestOptions(url, request), handler);
             rawRequest.on("error", function (error) {
-                reject(error);
+                reject(new Error("Request to " + url.toString() + " failed: " + (error.message != null ? error.message : error)));
             });
             var timeout = request.timeout;
             if (timeout != null && timeout > 0) {

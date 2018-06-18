@@ -215,7 +215,7 @@ function normalizePath(path) {
             parsed.hash = hashMatch[1];
             url = url.replace(hashMatcher, "");
         }
-        var paramsMatcher = /\?(.+)$/;
+        var paramsMatcher = /(?:\?|&)(.+)$/;
         var paramsMatch = paramsMatcher.exec(url);
         if (paramsMatch != null) {
             parsed.params = decodeQuery(paramsMatch[1]);

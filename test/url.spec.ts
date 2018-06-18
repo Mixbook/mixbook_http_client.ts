@@ -70,6 +70,10 @@ describe("Url", () => {
       expect(builder("example.com:3000?foo=bar")).to.eq("//example.com:3000/foo?foo=bar");
     });
 
+    it("parses with wrong format - & instead of ?", () => {
+      expect(builder("example.com:3000/blah&foo=bar&a=b")).to.eq("//example.com:3000/blah/foo?a=b&foo=bar");
+    });
+
     it("parses with params and port and trailing slash", () => {
       expect(builder("example.com:3000/?foo=bar")).to.eq("//example.com:3000/foo?foo=bar");
     });

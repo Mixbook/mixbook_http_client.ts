@@ -199,7 +199,7 @@ export namespace Url {
       url = url.replace(hashMatcher, "");
     }
 
-    const paramsMatcher = /\?(.+)$/;
+    const paramsMatcher = /(?:\?|&)(.+)$/;
     const paramsMatch = paramsMatcher.exec(url);
     if (paramsMatch != null) {
       parsed.params = decodeQuery(paramsMatch[1]);
