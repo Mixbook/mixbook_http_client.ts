@@ -59,7 +59,7 @@ export class BrowserHttpClientSession implements IHttpClientSession {
     this._promise = new Promise<IResponse>((resolve, reject) => {
       this._xhr.upload.onprogress = FunctionUtils.throttle((e: ProgressEvent) => this.onUploadProgress.push(e), 1000);
       this._xhr.onprogress = FunctionUtils.throttle((e: ProgressEvent) => this.onDownloadProgress.push(e), 1000);
-      this._xhr.onerror = e => reject(new Error(`Failed request to ${request.url.toString()}`));
+      this._xhr.onerror = e => reject(new Error(`Failed request to ${request.url.toString()} reason: ${e.message}`));
       this._xhr.ontimeout = e => reject(new Error(`Request to ${request.url.toString()} timed out`));
       this._xhr.onload = e => {
         resolve(new BrowserResponse(this._xhr));
