@@ -24,21 +24,13 @@ export class BrowserHttpClientSession implements IHttpClientSession {
   }
 
   public async start(request: IRequest): Promise<void> {
-    this._xhr.open(request.method, request.url.toString());
-
     if (request.timeout != null) {
       this._xhr.timeout = request.timeout;
     }
 
     const headers = request.headers || {};
 
-    if (headers != null) {
-      for (const headerName of Object.getOwnPropertyNames(headers)) {
-        this._xhr.setRequestHeader(headerName, headers[headerName]);
-      }
-    }
-
-    let body;
+    let body: string | FormData | undefined;
     if (request.body != null) {
       if (typeof request.body === "string") {
         body = request.body;
@@ -54,16 +46,23 @@ export class BrowserHttpClientSession implements IHttpClientSession {
     if (headers.accept === "application/msgpack") {
       this._xhr.responseType = "blob";
     }
-    this._xhr.send(body);
 
     this._promise = new Promise<IResponse>((resolve, reject) => {
       this._xhr.upload.onprogress = FunctionUtils.throttle((e: ProgressEvent) => this.onUploadProgress.push(e), 1000);
       this._xhr.onprogress = FunctionUtils.throttle((e: ProgressEvent) => this.onDownloadProgress.push(e), 1000);
-      this._xhr.onerror = e => reject(new Error(`Failed request to ${request.url.toString()} reason: ${e.message}`));
-      this._xhr.ontimeout = e => reject(new Error(`Request to ${request.url.toString()} timed out`));
-      this._xhr.onload = e => {
+      this._xhr.onerror = () => reject(new Error(`Failed request to ${request.url.toString()}`));
+      this._xhr.ontimeout = () => reject(new Error(`Request to ${request.url.toString()} timed out`));
+      this._xhr.onload = () => {
         resolve(new BrowserResponse(this._xhr));
       };
+
+      this._xhr.open(request.method, request.url.toString());
+
+      for (const headerName of Object.getOwnPropertyNames(headers)) {
+        this._xhr.setRequestHeader(headerName, headers[headerName]);
+      }
+
+      this._xhr.send(body);
     });
   }
 
