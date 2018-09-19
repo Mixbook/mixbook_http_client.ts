@@ -24,10 +24,6 @@ export class BrowserHttpClientSession implements IHttpClientSession {
   }
 
   public async start(request: IRequest): Promise<void> {
-    if (request.timeout != null) {
-      this._xhr.timeout = request.timeout;
-    }
-
     const headers = request.headers || {};
 
     let body: string | FormData | undefined;
@@ -57,6 +53,10 @@ export class BrowserHttpClientSession implements IHttpClientSession {
       };
 
       this._xhr.open(request.method, request.url.toString());
+
+      if (request.timeout != null) {
+        this._xhr.timeout = request.timeout;
+      }
 
       for (const headerName of Object.getOwnPropertyNames(headers)) {
         this._xhr.setRequestHeader(headerName, headers[headerName]);

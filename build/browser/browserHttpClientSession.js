@@ -61,9 +61,6 @@ var BrowserHttpClientSession = /** @class */ (function () {
             var _this = this;
             var headers, body, _i, _a, name_1;
             return __generator(this, function (_b) {
-                if (request.timeout != null) {
-                    this._xhr.timeout = request.timeout;
-                }
                 headers = request.headers || {};
                 if (request.body != null) {
                     if (typeof request.body === "string") {
@@ -89,6 +86,9 @@ var BrowserHttpClientSession = /** @class */ (function () {
                         resolve(new browserResponse_1.BrowserResponse(_this._xhr));
                     };
                     _this._xhr.open(request.method, request.url.toString());
+                    if (request.timeout != null) {
+                        _this._xhr.timeout = request.timeout;
+                    }
                     for (var _i = 0, _a = Object.getOwnPropertyNames(headers); _i < _a.length; _i++) {
                         var headerName = _a[_i];
                         _this._xhr.setRequestHeader(headerName, headers[headerName]);
