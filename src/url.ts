@@ -1,6 +1,6 @@
 export type TUrlRawQuery = Record<string, string[]>;
 
-export type TUrlQuery = Record<string, IStringifyable | string[] | undefined>;
+export type TUrlQuery = Record<string, string[]>;
 
 export interface IStringifyable {
   toString(): string;
@@ -118,10 +118,10 @@ export class Url {
     return {...(this.parts.params || {})};
   }
 
-  get nonNullParams(): Record<string, string[]> {
+  get nonNullParams(): TUrlQuery {
     const params = this.parts.params || {};
 
-    return Object.keys(params).reduce<Record<string, string[]>>(
+    return Object.keys(params).reduce<TUrlQuery>(
       (memo, key) => {
         const value = params[key];
 
@@ -131,7 +131,7 @@ export class Url {
 
         return memo;
       },
-      {} as Record<string, string[]>
+      {} as TUrlQuery
     );
   }
 
@@ -139,13 +139,14 @@ export class Url {
     return Object.keys(this.params || {})
       .sort((a, b) => (a < b ? -1 : a === b ? 0 : 1))
       .reduce((memo: string[], key: string) => {
-        const value = this.params[key];
+        const encodedKey = encodeURIComponent(key);
+        const value = this.params[encodedKey];
 
         if (value != null) {
           const values = value instanceof Array ? value : [value];
-          values.forEach(valueItem => memo.push(`${key}=${encodeURIComponent(valueItem.toString())}`));
+          values.forEach(valueItem => memo.push(`${encodedKey}=${encodeURIComponent(valueItem.toString())}`));
         } else {
-          memo.push(key);
+          memo.push(encodedKey);
         }
 
         return memo;
@@ -246,12 +247,11 @@ export namespace Url {
       .split("&")
       .map(part => part.split("="))
       .reduce(
-        (memo, [param, value]) => {
-          const decodedName = decode(param);
-          const decodedValue = decode(value);
-          if (param) {
-            memo[decodedName] ? memo[decodedName].push(decodedValue) : (memo[decodedName] = [decodedValue]);
-          }
+        (memo, [encodedName, encodedValue]) => {
+          const name = decode(encodedName);
+          const value = decode(encodedValue);
+          const values = memo[name] || (memo[name] = []);
+          values.push(value);
 
           return memo;
         },
