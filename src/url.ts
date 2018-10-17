@@ -1,6 +1,6 @@
-export type TUrlRawQuery = Record<string, string>;
+export type TUrlRawQuery = Record<string, string[]>;
 
-export type TUrlQuery = Record<string, IStringifyable | undefined>;
+export type TUrlQuery = Record<string, IStringifyable | string[] | undefined>;
 
 export interface IStringifyable {
   toString(): string;
@@ -118,14 +118,19 @@ export class Url {
     return {...(this.parts.params || {})};
   }
 
-  get nonNullParams(): Record<string, string> {
-    return Object.keys(this.parts.params || {}).reduce<Record<string, string>>((memo, key) => {
-      if (this.parts.params![key] != null) {
-        memo[key] = this.parts.params![key]!.toString();
-      }
+  get nonNullParams(): Record<string, string[]> {
+    return Object.keys(this.parts.params || {}).reduce<Record<string, string[]>>(
+      (memo, key) => {
+        if (this.parts.params![key] != null) {
+          memo[key]
+            ? memo[key].push(this.parts.params![key]!.toString())
+            : (memo[key] = [this.parts.params![key]!.toString()]);
+        }
 
-      return memo;
-    }, {});
+        return memo;
+      },
+      {} as Record<string, string[]>
+    );
   }
 
   get paramsAsString(): string {
@@ -133,7 +138,13 @@ export class Url {
       .sort((a, b) => (a < b ? -1 : a === b ? 0 : 1))
       .reduce((memo: string[], key: string) => {
         if (this.params[key] != null) {
-          memo.push(`${key}=${encodeURIComponent(this.params[key]!.toString())}`);
+          if (this.params[key] instanceof Array) {
+            (this.params[key]! as string[]).forEach(value => {
+              memo.push(`${key}=${encodeURIComponent(value.toString())}`);
+            });
+          } else {
+            memo.push(`${key}=${encodeURIComponent(this.params[key]!.toString())}`);
+          }
         } else {
           memo.push(`${key}`);
         }
@@ -237,8 +248,10 @@ export namespace Url {
       .map(part => part.split("="))
       .reduce(
         (memo, [param, value]) => {
+          const decodedName = decode(param);
+          const decodedValue = decode(value);
           if (param) {
-            memo[decode(param)] = decode(value);
+            memo[decodedName] ? memo[decodedName].push(decodedValue) : (memo[decodedName] = [decodedValue]);
           }
 
           return memo;

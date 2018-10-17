@@ -146,7 +146,14 @@ var Url = /** @class */ (function () {
                 .sort(function (a, b) { return (a < b ? -1 : a === b ? 0 : 1); })
                 .reduce(function (memo, key) {
                 if (_this.params[key] != null) {
-                    memo.push(key + "=" + encodeURIComponent(_this.params[key].toString()));
+                    if (_this.params[key] instanceof Array) {
+                        _this.params[key].forEach(function (value) {
+                            memo.push(key + "=" + encodeURIComponent(value.toString()));
+                        });
+                    }
+                    else {
+                        memo.push(key + "=" + encodeURIComponent(_this.params[key].toString()));
+                    }
                 }
                 else {
                     memo.push("" + key);
@@ -251,8 +258,10 @@ function normalizePath(path) {
             .map(function (part) { return part.split("="); })
             .reduce(function (memo, _a) {
             var param = _a[0], value = _a[1];
+            var decodedName = decode(param);
+            var decodedValue = decode(value);
             if (param) {
-                memo[decode(param)] = decode(value);
+                memo[decodedName] ? memo[decodedName].push(decodedValue) : (memo[decodedName] = [decodedValue]);
             }
             return memo;
         }, {});

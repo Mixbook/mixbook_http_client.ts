@@ -1,5 +1,5 @@
-export declare type TUrlRawQuery = Record<string, string>;
-export declare type TUrlQuery = Record<string, IStringifyable | undefined>;
+export declare type TUrlRawQuery = Record<string, string[]>;
+export declare type TUrlQuery = Record<string, IStringifyable | Array<string> | undefined>;
 export interface IStringifyable {
     toString(): string;
 }

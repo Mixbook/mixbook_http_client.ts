@@ -93,8 +93,20 @@ describe("Url", () => {
     it("extracts hash correctly with params", () => {
       const url = Url.fromString("http://example.com/foo/bar?a=b#foo");
       expect(url.path).to.eq("/foo/bar");
-      expect(url.params).to.eql({a: "b"});
+      expect(url.params).to.eql({a: ["b"]});
       expect(url.hash).to.eq("foo");
+    });
+
+    it("extracts array params using param=1,2,3 format", () => {
+      const url = Url.fromString("http://example.com/foo/bar?a=a,b");
+      expect(url.path).to.eq("/foo/bar");
+      expect(url.params).to.eql({a: ["a,b"]});
+    });
+
+    it("extracts array params using param=1&param=2 format", () => {
+      const url = Url.fromString("http://example.com/foo/bar?a=a&a=b");
+      expect(url.path).to.eq("/foo/bar");
+      expect(url.params).to.eql({a: ["a", "b"]});
     });
   });
 
