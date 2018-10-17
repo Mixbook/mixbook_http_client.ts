@@ -119,12 +119,14 @@ export class Url {
   }
 
   get nonNullParams(): Record<string, string[]> {
-    return Object.keys(this.parts.params || {}).reduce<Record<string, string[]>>(
+    const params = this.parts.params || {};
+
+    return Object.keys(params).reduce<Record<string, string[]>>(
       (memo, key) => {
-        if (this.parts.params![key] != null) {
-          memo[key]
-            ? memo[key].push(this.parts.params![key]!.toString())
-            : (memo[key] = [this.parts.params![key]!.toString()]);
+        const value = params[key];
+
+        if (value != null) {
+          memo[key] ? memo[key].push(value.toString()) : (memo[key] = [value.toString()]);
         }
 
         return memo;
@@ -137,16 +139,13 @@ export class Url {
     return Object.keys(this.params || {})
       .sort((a, b) => (a < b ? -1 : a === b ? 0 : 1))
       .reduce((memo: string[], key: string) => {
-        if (this.params[key] != null) {
-          if (this.params[key] instanceof Array) {
-            (this.params[key]! as string[]).forEach(value => {
-              memo.push(`${key}=${encodeURIComponent(value.toString())}`);
-            });
-          } else {
-            memo.push(`${key}=${encodeURIComponent(this.params[key]!.toString())}`);
-          }
+        const value = this.params[key];
+
+        if (value != null) {
+          const values = value instanceof Array ? value : [value];
+          values.forEach(valueItem => memo.push(`${key}=${encodeURIComponent(valueItem.toString())}`));
         } else {
-          memo.push(`${key}`);
+          memo.push(key);
         }
 
         return memo;
