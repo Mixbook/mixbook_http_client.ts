@@ -24,25 +24,6 @@ export class BrowserHttpClientSession implements IHttpClientSession {
   }
 
   public async start(request: IRequest): Promise<void> {
-    const headers = request.headers || {};
-
-    let body: string | FormData | undefined;
-    if (request.body != null) {
-      if (typeof request.body === "string") {
-        body = request.body;
-      } else {
-        body = new FormData();
-
-        for (const name of Object.getOwnPropertyNames(request.body)) {
-          body.append(name, request.body[name]);
-        }
-      }
-    }
-
-    if (headers.accept === "application/msgpack") {
-      this._xhr.responseType = "blob";
-    }
-
     this._promise = new Promise<IResponse>((resolve, reject) => {
       this._xhr.upload.onprogress = FunctionUtils.throttle((e: ProgressEvent) => this.onUploadProgress.push(e), 1000);
       this._xhr.onprogress = FunctionUtils.throttle((e: ProgressEvent) => this.onDownloadProgress.push(e), 1000);
@@ -58,8 +39,27 @@ export class BrowserHttpClientSession implements IHttpClientSession {
         this._xhr.timeout = request.timeout;
       }
 
+      const headers = request.headers || {};
+
+      if (headers.accept === "application/msgpack") {
+        this._xhr.responseType = "blob";
+      }
+
       for (const headerName of Object.getOwnPropertyNames(headers)) {
         this._xhr.setRequestHeader(headerName, headers[headerName]);
+      }
+
+      let body: string | FormData | undefined;
+      if (request.body != null) {
+        if (typeof request.body === "string") {
+          body = request.body;
+        } else {
+          body = new FormData();
+
+          for (const name of Object.getOwnPropertyNames(request.body)) {
+            body.append(name, request.body[name]);
+          }
+        }
       }
 
       this._xhr.send(body);

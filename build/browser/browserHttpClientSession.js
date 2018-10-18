@@ -59,24 +59,7 @@ var BrowserHttpClientSession = /** @class */ (function () {
     BrowserHttpClientSession.prototype.start = function (request) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var headers, body, _i, _a, name_1;
-            return __generator(this, function (_b) {
-                headers = request.headers || {};
-                if (request.body != null) {
-                    if (typeof request.body === "string") {
-                        body = request.body;
-                    }
-                    else {
-                        body = new FormData();
-                        for (_i = 0, _a = Object.getOwnPropertyNames(request.body); _i < _a.length; _i++) {
-                            name_1 = _a[_i];
-                            body.append(name_1, request.body[name_1]);
-                        }
-                    }
-                }
-                if (headers.accept === "application/msgpack") {
-                    this._xhr.responseType = "blob";
-                }
+            return __generator(this, function (_a) {
                 this._promise = new Promise(function (resolve, reject) {
                     _this._xhr.upload.onprogress = functionUtils_1.FunctionUtils.throttle(function (e) { return _this.onUploadProgress.push(e); }, 1000);
                     _this._xhr.onprogress = functionUtils_1.FunctionUtils.throttle(function (e) { return _this.onDownloadProgress.push(e); }, 1000);
@@ -89,9 +72,26 @@ var BrowserHttpClientSession = /** @class */ (function () {
                     if (request.timeout != null) {
                         _this._xhr.timeout = request.timeout;
                     }
+                    var headers = request.headers || {};
+                    if (headers.accept === "application/msgpack") {
+                        _this._xhr.responseType = "blob";
+                    }
                     for (var _i = 0, _a = Object.getOwnPropertyNames(headers); _i < _a.length; _i++) {
                         var headerName = _a[_i];
                         _this._xhr.setRequestHeader(headerName, headers[headerName]);
+                    }
+                    var body;
+                    if (request.body != null) {
+                        if (typeof request.body === "string") {
+                            body = request.body;
+                        }
+                        else {
+                            body = new FormData();
+                            for (var _b = 0, _c = Object.getOwnPropertyNames(request.body); _b < _c.length; _b++) {
+                                var name_1 = _c[_b];
+                                body.append(name_1, request.body[name_1]);
+                            }
+                        }
                     }
                     _this._xhr.send(body);
                 });
