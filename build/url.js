@@ -13,23 +13,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var Url = /** @class */ (function () {
     function Url(parts) {
-        this.parts = parts;
+        this._parts = parts;
     }
     Url.prototype.appendPath = function (path) {
         var normalizedPath = path.replace(/^(\/+)/, "");
         var newPath = "/" + this.pathAsArray.concat(normalizedPath).join("/");
-        return new Url(__assign({}, this.parts, { path: newPath }));
+        return new Url(__assign({}, this._parts, { path: newPath }));
     };
     Url.prototype.replacePath = function (path) {
         var normalizedPath = normalizePath(path);
-        return new Url(__assign({}, this.parts, { path: normalizedPath }));
+        return new Url(__assign({}, this._parts, { path: normalizedPath }));
     };
     Url.prototype.appendParams = function (params) {
-        var newParams = __assign({}, (this.parts.params || {}), params);
-        return new Url(__assign({}, this.parts, { params: newParams }));
+        var oldParams = this._parts.params || {};
+        var keys = Object.keys(oldParams).concat(Object.keys(params));
+        var newParams = keys.reduce(function (memo, name) {
+            !memo[name] && (memo[name] = (oldParams[name] || []).concat(params[name] || []));
+            return memo;
+        }, {});
+        return new Url(__assign({}, this._parts, { params: newParams }));
     };
     Url.prototype.replaceParams = function (params) {
-        return new Url(__assign({}, this.parts, { params: params }));
+        return new Url(__assign({}, this._parts, { params: params }));
     };
     Url.prototype.equals = function (other) {
         return other instanceof Url && this.toString() === other.toString();
@@ -66,35 +71,35 @@ var Url = /** @class */ (function () {
     });
     Object.defineProperty(Url.prototype, "host", {
         get: function () {
-            return this.parts.host || "";
+            return this._parts.host || "";
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Url.prototype, "hash", {
         get: function () {
-            return this.parts.hash || "";
+            return this._parts.hash || "";
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Url.prototype, "scheme", {
         get: function () {
-            return this.parts.scheme || "";
+            return this._parts.scheme || "";
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Url.prototype, "port", {
         get: function () {
-            return this.parts.port || "";
+            return this._parts.port || "";
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Url.prototype, "path", {
         get: function () {
-            var path = this.parts.path || "";
+            var path = this._parts.path || "";
             if (path[0] !== "/") {
                 path = "/" + path;
             }
@@ -121,42 +126,24 @@ var Url = /** @class */ (function () {
     });
     Object.defineProperty(Url.prototype, "params", {
         get: function () {
-            return __assign({}, (this.parts.params || {}));
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Url.prototype, "nonNullParams", {
-        get: function () {
-            var _this = this;
-            return Object.keys(this.parts.params || {}).reduce(function (memo, key) {
-                if (_this.parts.params[key] != null) {
-                    memo[key] = _this.parts.params[key].toString();
-                }
-                return memo;
-            }, {});
+            return __assign({}, (this._parts.params || {}));
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Url.prototype, "paramsAsString", {
         get: function () {
-            var _this = this;
-            return Object.keys(this.params || {})
+            var _a = this._parts.params, params = _a === void 0 ? {} : _a;
+            return Object.keys(params)
                 .sort(function (a, b) { return (a < b ? -1 : a === b ? 0 : 1); })
-                .reduce(function (memo, key) {
-                if (_this.params[key] != null) {
-                    if (_this.params[key] instanceof Array) {
-                        _this.params[key].forEach(function (value) {
-                            memo.push(key + "=" + encodeURIComponent(value.toString()));
-                        });
-                    }
-                    else {
-                        memo.push(key + "=" + encodeURIComponent(_this.params[key].toString()));
-                    }
+                .reduce(function (memo, name) {
+                var values = params[name];
+                var encodedName = Url.encode(name);
+                if (values.length > 0) {
+                    memo.push.apply(memo, values.map(function (value) { return encodedName + "=" + Url.encode(value); }));
                 }
                 else {
-                    memo.push("" + key);
+                    memo.push(encodedName);
                 }
                 return memo;
             }, [])
@@ -257,12 +244,11 @@ function normalizePath(path) {
             .split("&")
             .map(function (part) { return part.split("="); })
             .reduce(function (memo, _a) {
-            var param = _a[0], value = _a[1];
-            var decodedName = decode(param);
-            var decodedValue = decode(value);
-            if (param) {
-                memo[decodedName] ? memo[decodedName].push(decodedValue) : (memo[decodedName] = [decodedValue]);
-            }
+            var encodedName = _a[0], encodedValue = _a[1];
+            var name = decode(encodedName);
+            var value = decode(encodedValue);
+            var values = memo[name] || (memo[name] = []);
+            values.push(value);
             return memo;
         }, {});
     }
@@ -272,6 +258,10 @@ function normalizePath(path) {
         return decodeURIComponent(value).replace(/\+/g, " ");
     }
     Url.decode = decode;
+    function encode(value) {
+        return encodeURIComponent(value.replace(/\s/g, "+"));
+    }
+    Url.encode = encode;
 })(Url = exports.Url || (exports.Url = {}));
 exports.Url = Url;
 //# sourceMappingURL=url.js.map

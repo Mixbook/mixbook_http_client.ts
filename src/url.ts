@@ -1,17 +1,11 @@
-export type TUrlRawQuery = Record<string, string[]>;
-
-export type TUrlQuery = Record<string, string[]>;
-
-export interface IStringifyable {
-  toString(): string;
-}
+export type TUrlParams = Record<string, string[]>;
 
 export interface IParts {
   scheme?: string;
   host?: string;
   port?: string;
   path?: string;
-  params?: TUrlQuery;
+  params?: TUrlParams;
   hash?: string;
 }
 
@@ -19,29 +13,43 @@ export interface IParts {
  * Utility class for parsing and building URLs.
  */
 export class Url {
-  constructor(private parts: IParts) {}
+  private _parts: IParts;
+
+  constructor(parts: IParts) {
+    this._parts = parts;
+  }
 
   public appendPath(path: string): Url {
     const normalizedPath = path.replace(/^(\/+)/, "");
     const newPath = `/${this.pathAsArray.concat(normalizedPath).join("/")}`;
 
-    return new Url({...this.parts, path: newPath});
+    return new Url({...this._parts, path: newPath});
   }
 
   public replacePath(path: string): Url {
     const normalizedPath = normalizePath(path);
 
-    return new Url({...this.parts, path: normalizedPath});
+    return new Url({...this._parts, path: normalizedPath});
   }
 
-  public appendParams(params: TUrlQuery): Url {
-    const newParams = {...(this.parts.params || {}), ...params};
+  public appendParams(params: TUrlParams): Url {
+    const oldParams = this._parts.params || {};
+    const keys = Object.keys(oldParams).concat(Object.keys(params));
 
-    return new Url({...this.parts, params: newParams});
+    const newParams = keys.reduce(
+      (memo: TUrlParams, name: string) => {
+        !memo[name] && (memo[name] = (oldParams[name] || []).concat(params[name] || []));
+
+        return memo;
+      },
+      {} as TUrlParams
+    );
+
+    return new Url({...this._parts, params: newParams});
   }
 
-  public replaceParams(params: TUrlQuery): Url {
-    return new Url({...this.parts, params});
+  public replaceParams(params: TUrlParams): Url {
+    return new Url({...this._parts, params});
   }
 
   public equals(other: Url): boolean {
@@ -78,23 +86,23 @@ export class Url {
   }
 
   get host(): string {
-    return this.parts.host || "";
+    return this._parts.host || "";
   }
 
   get hash(): string {
-    return this.parts.hash || "";
+    return this._parts.hash || "";
   }
 
   get scheme(): string {
-    return this.parts.scheme || "";
+    return this._parts.scheme || "";
   }
 
   get port(): string {
-    return this.parts.port || "";
+    return this._parts.port || "";
   }
 
   get path(): string {
-    let path = this.parts.path || "";
+    let path = this._parts.path || "";
     if (path[0] !== "/") {
       path = `/${path}`;
     }
@@ -114,39 +122,23 @@ export class Url {
     return parts.length > 1 ? parts[parts.length - 1] : "";
   }
 
-  get params(): TUrlQuery {
-    return {...(this.parts.params || {})};
-  }
-
-  get nonNullParams(): TUrlQuery {
-    const params = this.parts.params || {};
-
-    return Object.keys(params).reduce<TUrlQuery>(
-      (memo, key) => {
-        const value = params[key];
-
-        if (value != null) {
-          memo[key] ? memo[key].push(value.toString()) : (memo[key] = [value.toString()]);
-        }
-
-        return memo;
-      },
-      {} as TUrlQuery
-    );
+  get params(): TUrlParams {
+    return {...(this._parts.params || {})};
   }
 
   get paramsAsString(): string {
-    return Object.keys(this.params || {})
-      .sort((a, b) => (a < b ? -1 : a === b ? 0 : 1))
-      .reduce((memo: string[], key: string) => {
-        const encodedKey = encodeURIComponent(key);
-        const value = this.params[encodedKey];
+    const {params = {}} = this._parts;
 
-        if (value != null) {
-          const values = value instanceof Array ? value : [value];
-          values.forEach(valueItem => memo.push(`${encodedKey}=${encodeURIComponent(valueItem.toString())}`));
+    return Object.keys(params)
+      .sort((a, b) => (a < b ? -1 : a === b ? 0 : 1))
+      .reduce((memo: string[], name: string) => {
+        const values = params[name];
+        const encodedName = Url.encode(name);
+
+        if (values.length > 0) {
+          memo.push(...values.map(value => `${encodedName}=${Url.encode(value)}`));
         } else {
-          memo.push(encodedKey);
+          memo.push(encodedName);
         }
 
         return memo;
@@ -238,7 +230,7 @@ export namespace Url {
     });
   }
 
-  export function decodeQuery(queryString: string): TUrlRawQuery {
+  export function decodeQuery(queryString: string): TUrlParams {
     if (!queryString) {
       return {};
     }
@@ -255,12 +247,16 @@ export namespace Url {
 
           return memo;
         },
-        {} as TUrlRawQuery
+        {} as TUrlParams
       );
   }
 
   export function decode(value: string): string {
     // decodeURIComponent doesn't touch pluses, which encode spaces
     return decodeURIComponent(value).replace(/\+/g, " ");
+  }
+
+  export function encode(value: string): string {
+    return encodeURIComponent(value.replace(/\s/g, "+"));
   }
 }

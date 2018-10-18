@@ -62,6 +62,10 @@ describe("Url", () => {
       expect(builder("example.com?foo=bar")).to.eq("//example.com/foo?foo=bar");
     });
 
+    it("parses with array params", () => {
+      expect(builder("example.com/?foo[]=bar&foo[]=bar2")).to.eq("//example.com/foo?foo%5B%5D=bar&foo%5B%5D=bar2");
+    });
+
     it("parses with params and trailing slash", () => {
       expect(builder("example.com/?foo=bar")).to.eq("//example.com/foo?foo=bar");
     });
@@ -108,6 +112,13 @@ describe("Url", () => {
       expect(url.path).to.eq("/foo/bar");
       expect(url.params).to.eql({a: ["a", "b"]});
     });
+
+    it("decodes params", () => {
+      const url = Url.fromString("http://example.com/foo/bar?foo%5B%5D=bar&foo%5B%5D=bar2");
+
+      expect(url.path).to.eq("/foo/bar");
+      expect(url.params).to.eql({"foo[]": ["bar", "bar2"]});
+    });
   });
 
   describe("#appendPath()", () => {
@@ -120,7 +131,12 @@ describe("Url", () => {
   describe("#appendParams()", () => {
     it("adds new params to already existing ones", () => {
       const url = Url.fromString("http://example.com/foo/bar?a=b");
-      expect(url.appendParams({c: "d"}).toString()).to.eq("http://example.com/foo/bar?a=b&c=d");
+      expect(url.appendParams({c: ["d"]}).toString()).to.eq("http://example.com/foo/bar?a=b&c=d");
+    });
+
+    it("adds param with same name as existing one", () => {
+      const url = Url.fromString("http://example.com/foo/bar?a=b");
+      expect(url.appendParams({a: ["c"]}).toString()).to.eq("http://example.com/foo/bar?a=b&a=c");
     });
   });
 
@@ -134,7 +150,7 @@ describe("Url", () => {
   describe("#toString()", () => {
     it("encodes the params", () => {
       const url = Url.fromString("http://example.com/foo/bar");
-      expect(url.appendParams({foo: "<?/>&"}).toString()).to.contain("foo=%3C%3F%2F%3E%26");
+      expect(url.appendParams({foo: ["<?/>&"]}).toString()).to.contain("foo=%3C%3F%2F%3E%26");
     });
   });
 });

@@ -1,26 +1,22 @@
-export declare type TUrlRawQuery = Record<string, string[]>;
-export declare type TUrlQuery = Record<string, IStringifyable | Array<string> | undefined>;
-export interface IStringifyable {
-    toString(): string;
-}
+export declare type TUrlParams = Record<string, string[]>;
 export interface IParts {
     scheme?: string;
     host?: string;
     port?: string;
     path?: string;
-    params?: TUrlQuery;
+    params?: TUrlParams;
     hash?: string;
 }
 /**
  * Utility class for parsing and building URLs.
  */
 export declare class Url {
-    private parts;
+    private _parts;
     constructor(parts: IParts);
     appendPath(path: string): Url;
     replacePath(path: string): Url;
-    appendParams(params: TUrlQuery): Url;
-    replaceParams(params: TUrlQuery): Url;
+    appendParams(params: TUrlParams): Url;
+    replaceParams(params: TUrlParams): Url;
     equals(other: Url): boolean;
     toString(): string;
     readonly pathWithParams: string;
@@ -31,8 +27,7 @@ export declare class Url {
     readonly path: string;
     readonly baseName: string;
     readonly extension: string;
-    readonly params: TUrlQuery;
-    readonly nonNullParams: Record<string, string>;
+    readonly params: TUrlParams;
     readonly paramsAsString: string;
     readonly paramsAsStringWithSeparator: string;
     readonly pathAsArray: string[];
@@ -40,6 +35,7 @@ export declare class Url {
 export declare namespace Url {
     function fromString(input: string): Url;
     function fromClientWindow(clientWindow?: Window): Url;
-    function decodeQuery(queryString: string): TUrlRawQuery;
+    function decodeQuery(queryString: string): TUrlParams;
     function decode(value: string): string;
+    function encode(value: string): string;
 }
