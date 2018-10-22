@@ -257,6 +257,6 @@ export namespace Url {
   }
 
   export function encode(value: string): string {
-    return encodeURIComponent(value.replace(/\s/g, "+"));
+    return encodeURIComponent((value || "").replace(/\s/g, "+"));
   }
 }
